@@ -53,6 +53,7 @@
     --gold: #f59e0b;
     --green: #10b981;
     --red: #ef4444;
+    --purple: #8b5cf6;
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
@@ -143,7 +144,7 @@
     gap: 0.5rem;
   }
   .swimmer-header h2 { font-size: 1.25rem; }
-  .swimmer-header .meta { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .swimmer-header .meta { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
   .badge {
     display: inline-block;
     padding: 0.25rem 0.75rem;
@@ -153,6 +154,22 @@
   }
   .badge-lane { background: var(--light-blue); color: var(--blue); }
   .badge-age { background: #fef3c7; color: #92400e; }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.7rem;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    background: white;
+    color: var(--gray-500);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .share-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .share-btn.copied { border-color: var(--green); color: var(--green); }
 
   .card {
     background: white;
@@ -196,13 +213,97 @@
     align-items: center;
     padding: 0.5rem 0;
     border-bottom: 1px solid var(--gray-100);
+    flex-wrap: wrap;
+    gap: 0.25rem;
   }
   .best-time-row:last-child { border-bottom: none; }
   .best-time-row .event-name { font-weight: 500; font-size: 0.875rem; }
   .best-time-row .time { font-weight: 700; font-family: 'SF Mono', 'Fira Code', monospace; }
-  .improvement { font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem; }
+  .best-time-row .time-info { display: flex; align-items: center; flex-wrap: wrap; gap: 0.25rem; }
+  .improvement { font-size: 0.75rem; font-weight: 600; }
   .improvement.positive { color: var(--green); }
   .improvement.negative { color: var(--red); }
+
+  .std-badge {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .std-B { background: #dbeafe; color: #1e40af; }
+  .std-BB { background: #c7d2fe; color: #3730a3; }
+  .std-A { background: #d1fae5; color: #065f46; }
+  .std-AA { background: #fef3c7; color: #92400e; }
+  .std-AAA { background: #fde68a; color: #78350f; }
+  .std-AAAA { background: #fed7aa; color: #9a3412; }
+  .std-FUT { background: #e9d5ff; color: #6b21a8; }
+
+  .percentile-bar-container {
+    height: 6px;
+    background: var(--gray-100);
+    border-radius: 3px;
+    width: 80px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+  }
+  .percentile-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--blue);
+  }
+  .percentile-text {
+    font-size: 0.7rem;
+    color: var(--gray-500);
+    margin-left: 0.35rem;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .summary-stat {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: var(--gray-50);
+  }
+  .summary-stat .value { font-size: 1.5rem; font-weight: 700; }
+  .summary-stat .label { font-size: 0.7rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600; }
+  .summary-stat.good .value { color: var(--green); }
+  .summary-stat.bad .value { color: var(--red); }
+  .summary-stat.neutral .value { color: var(--gray-500); }
+
+  .delta-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+  .delta-table th {
+    text-align: left;
+    padding: 0.4rem 0.5rem;
+    border-bottom: 2px solid var(--gray-200);
+    font-weight: 600;
+    color: var(--gray-500);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .delta-table td {
+    padding: 0.4rem 0.5rem;
+    border-bottom: 1px solid var(--gray-100);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    white-space: nowrap;
+  }
+  .delta-table .event-col { font-family: inherit; font-weight: 500; }
+  .delta-pos { color: var(--green); font-weight: 600; }
+  .delta-neg { color: var(--red); font-weight: 600; }
+  .delta-na { color: var(--gray-300); }
+  .delta-pb { font-size: 0.6rem; vertical-align: super; color: var(--gold); font-weight: 700; }
 
   .ranking-table {
     width: 100%;
@@ -233,6 +334,7 @@
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
   }
   .view-btn {
     padding: 0.5rem 1rem;
@@ -245,6 +347,73 @@
   }
   .view-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
 
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: var(--gray-500);
+  }
+  .toggle-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background: var(--gray-200);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle-switch.on { background: var(--blue); }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .toggle-switch.on::after { transform: translateX(16px); }
+
+  .compare-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .compare-section label { font-weight: 600; font-size: 0.875rem; color: var(--gray-700); display: block; margin-bottom: 0.5rem; }
+  .compare-swimmers {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .compare-swimmers select {
+    flex: 1;
+    min-width: 180px;
+    padding: 0.5rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    background: white;
+  }
+  .compare-swimmers select:focus { outline: none; border-color: var(--blue); }
+  .compare-btn {
+    padding: 0.5rem 1rem;
+    background: var(--purple);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .compare-btn:hover { opacity: 0.9; }
+
   footer {
     text-align: center;
     padding: 2rem 1rem;
@@ -254,9 +423,12 @@
   footer a { color: var(--blue); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
 
+  .overflow-x { overflow-x: auto; }
+
   @media (max-width: 640px) {
     .swimmer-header { flex-direction: column; align-items: flex-start; }
     .chart-container { height: 220px; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -291,6 +463,19 @@
       </select>
     </div>
     <div id="swimmerView"></div>
+
+    <div class="compare-section" id="compareSection" style="display:none">
+      <label>Compare Swimmers</label>
+      <div class="compare-swimmers">
+        <select id="compare1" class="swimmer-select" style="padding:0.5rem"><option value="">Swimmer 1</option></select>
+        <select id="compare2" class="swimmer-select" style="padding:0.5rem"><option value="">Swimmer 2</option></select>
+        <select id="compare3" class="swimmer-select" style="padding:0.5rem"><option value="">Swimmer 3 (optional)</option></select>
+      </div>
+      <div style="margin-top:1rem">
+        <div class="event-tabs" id="compareEventTabs"></div>
+        <div class="chart-container"><canvas id="compareChart"></canvas></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -305,6 +490,72 @@ const PASSWORD_HASH = 'b7e88684a8ca4218479e815ed6546d69ec1d2fa16de5e7b5d6a1f05f8
 const ENC_CSV_URL = '%%ENC_CSV_URL%%';
 const ENC_EDIT_URL = '%%ENC_EDIT_URL%%';
 
+// ── USA Swimming 2024-2025 SCY Motivational Time Standards ──
+// Format: TIME_STANDARDS[gender][ageGroup][event][level] = seconds
+// Gender is inferred from names in the data (or defaults to combined).
+// Age groups: '10U', '11-12', '13-14', '15-16', '17-18'
+// Levels: B, BB, A, AA, AAA, AAAA, FUT (Futures)
+const TIME_STANDARDS = {
+  M: {
+    '10U':  { '50 Free': {B:38.39,BB:34.99,A:32.19,AA:29.49,AAA:27.69,AAAA:26.29}, '50 Back': {B:44.59,BB:40.39,A:37.29,AA:34.09,AAA:31.99,AAAA:30.39}, '50 Fly': {B:44.09,BB:39.49,A:36.39,AA:33.29,AAA:31.29,AAAA:29.69}, '50 Breast': {B:48.99,BB:44.59,A:41.09,AA:37.59,AAA:35.29,AAAA:33.49} },
+    '11-12': { '50 Free': {B:32.49,BB:29.49,A:27.19,AA:24.89,AAA:23.39,AAAA:22.19}, '50 Back': {B:38.09,BB:34.49,A:31.79,AA:29.09,AAA:27.29,AAAA:25.89}, '50 Fly': {B:36.79,BB:33.19,A:30.59,AA:27.99,AAA:26.29,AAAA:24.89}, '50 Breast': {B:42.69,BB:38.69,A:35.69,AA:32.59,AAA:30.59,AAAA:29.09} },
+    '13-14': { '50 Free': {B:28.09,BB:25.79,A:23.79,AA:22.39,AAA:21.59,AAAA:20.89}, '50 Back': {B:33.19,BB:30.49,A:28.09,AA:26.39,AAA:25.49,AAAA:24.69}, '50 Fly': {B:31.49,BB:28.89,A:26.69,AA:25.09,AAA:24.19,AAAA:23.39}, '50 Breast': {B:36.89,BB:33.89,A:31.29,AA:29.39,AAA:28.39,AAAA:27.39} },
+    '15-16': { '50 Free': {B:25.39,BB:23.69,A:22.29,AA:21.49,AAA:20.89,AAAA:20.29,FUT:20.99}, '50 Back': {B:30.09,BB:28.09,A:26.39,AA:25.49,AAA:24.79,AAAA:24.09,FUT:24.99}, '50 Fly': {B:28.39,BB:26.49,A:24.89,AA:24.09,AAA:23.39,AAAA:22.69,FUT:23.49}, '50 Breast': {B:33.39,BB:31.19,A:29.29,AA:28.29,AAA:27.49,AAAA:26.69,FUT:27.59} },
+    '17-18': { '50 Free': {B:24.29,BB:22.89,A:21.79,AA:21.09,AAA:20.59,AAAA:19.99,FUT:20.99}, '50 Back': {B:28.79,BB:27.09,A:25.79,AA:24.99,AAA:24.39,AAAA:23.69,FUT:24.99}, '50 Fly': {B:27.19,BB:25.59,A:24.39,AA:23.59,AAA:23.09,AAAA:22.39,FUT:23.49}, '50 Breast': {B:31.99,BB:30.09,A:28.69,AA:27.79,AAA:27.09,AAAA:26.29,FUT:27.59} }
+  },
+  F: {
+    '10U':  { '50 Free': {B:37.19,BB:33.89,A:31.29,AA:28.59,AAA:26.89,AAAA:25.49}, '50 Back': {B:42.89,BB:38.89,A:35.89,AA:32.79,AAA:30.79,AAAA:29.19}, '50 Fly': {B:43.29,BB:38.89,A:35.89,AA:32.79,AAA:30.79,AAAA:29.19}, '50 Breast': {B:47.09,BB:42.89,A:39.49,AA:36.19,AAA:33.99,AAAA:32.19} },
+    '11-12': { '50 Free': {B:31.09,BB:28.19,A:25.99,AA:23.79,AAA:22.39,AAAA:21.19}, '50 Back': {B:36.09,BB:32.69,A:30.09,AA:27.59,AAA:25.89,AAAA:24.59}, '50 Fly': {B:35.59,BB:32.09,A:29.59,AA:27.09,AAA:25.39,AAAA:24.09}, '50 Breast': {B:40.99,BB:37.19,A:34.29,AA:31.39,AAA:29.49,AAAA:27.99} },
+    '13-14': { '50 Free': {B:28.49,BB:26.29,A:24.69,AA:23.79,AAA:23.19,AAAA:22.59}, '50 Back': {B:33.29,BB:30.69,A:28.89,AA:27.79,AAA:27.09,AAAA:26.39}, '50 Fly': {B:32.09,BB:29.59,A:27.79,AA:26.79,AAA:26.09,AAAA:25.39}, '50 Breast': {B:37.49,BB:34.59,A:32.49,AA:31.29,AAA:30.49,AAAA:29.69} },
+    '15-16': { '50 Free': {B:27.29,BB:25.49,A:24.19,AA:23.39,AAA:22.89,AAAA:22.29,FUT:23.39}, '50 Back': {B:31.89,BB:29.79,A:28.29,AA:27.39,AAA:26.79,AAAA:26.09,FUT:27.49}, '50 Fly': {B:30.69,BB:28.69,A:27.19,AA:26.39,AAA:25.79,AAAA:25.09,FUT:26.39}, '50 Breast': {B:35.89,BB:33.59,A:31.89,AA:30.89,AAA:30.19,AAAA:29.39,FUT:30.89} },
+    '17-18': { '50 Free': {B:26.89,BB:25.29,A:24.09,AA:23.29,AAA:22.79,AAAA:22.19,FUT:23.39}, '50 Back': {B:31.39,BB:29.59,A:28.19,AA:27.29,AAA:26.69,AAAA:25.99,FUT:27.49}, '50 Fly': {B:30.19,BB:28.49,A:27.09,AA:26.29,AAA:25.69,AAAA:24.99,FUT:26.39}, '50 Breast': {B:35.29,BB:33.29,A:31.69,AA:30.69,AAA:30.09,AAAA:29.19,FUT:30.89} }
+  }
+};
+
+// Known female swimmers (we'll auto-detect from common names, but this helps)
+const FEMALE_NAMES = new Set(['Natalie','Neya','Olivia','Fiona','Lily','Kaia','Madison','Manon','Emma','Anna','Penelope','Vivian','Lillian','Lucy','Alessia','Lara','Andi','Katrina','Mia','Sofia','Sarah','Emily','Sophia','Isabella','Grace','Ava','Chloe','Ella','Abigail','Hannah','Victoria','Nora','Lena','Mila','Iris','Ruby','Alice','Aria','Luna','Stella','Violet','Hazel','Ivy','Piper','Quinn','Willow','Aurora','Savannah','Brooklyn','Leah','Zoe','Addison','Aubrey','Eleanor','Paisley','Bella','Claire','Skylar','Maya','Caroline','Layla','Madelyn','Ellie','Hailey','Aaliyah','Riley','Gabriella','Sadie','Audrey','Naomi','Allison','Samantha','Natalia','Eva','Valentina']);
+
+let showStandards = false;
+
+function getAgeGroup(age) {
+  if (age <= 10) return '10U';
+  if (age <= 12) return '11-12';
+  if (age <= 14) return '13-14';
+  if (age <= 16) return '15-16';
+  return '17-18';
+}
+
+function getGender(firstName) {
+  return FEMALE_NAMES.has(firstName) ? 'F' : 'M';
+}
+
+function getTimeStandard(firstName, age, event, timeSecs) {
+  if (!timeSecs || timeSecs <= 0) return null;
+  const gender = getGender(firstName);
+  const ageGroup = getAgeGroup(age);
+  const stds = TIME_STANDARDS[gender]?.[ageGroup]?.[event];
+  if (!stds) return null;
+  const levels = ['FUT','AAAA','AAA','AA','A','BB','B'];
+  for (const lvl of levels) {
+    if (stds[lvl] && timeSecs <= stds[lvl]) return lvl;
+  }
+  return null;
+}
+
+function getNextStandard(firstName, age, event, timeSecs) {
+  if (!timeSecs || timeSecs <= 0) return null;
+  const gender = getGender(firstName);
+  const ageGroup = getAgeGroup(age);
+  const stds = TIME_STANDARDS[gender]?.[ageGroup]?.[event];
+  if (!stds) return null;
+  const levels = ['B','BB','A','AA','AAA','AAAA','FUT'];
+  for (const lvl of levels) {
+    if (stds[lvl] && timeSecs > stds[lvl]) return { level: lvl, time: stds[lvl], gap: timeSecs - stds[lvl] };
+  }
+  return null;
+}
+
+// ── Auth ──
 async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -318,7 +569,7 @@ async function deriveKey(pw) {
 async function decrypt(encB64, pw) {
   const buf = Uint8Array.from(atob(encB64), c => c.charCodeAt(0));
   const iv = buf.slice(0, 12);
-  const ciphertextAndTag = buf.slice(12); // WebCrypto expects ciphertext + 16-byte tag
+  const ciphertextAndTag = buf.slice(12);
   const key = await deriveKey(pw);
   const dec = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertextAndTag);
   return new TextDecoder().decode(dec);
@@ -348,23 +599,22 @@ async function unlock() {
   init();
 }
 
-// Auto-unlock if previously authenticated (need both hash and password)
 (async () => {
   const storedPw = localStorage.getItem('pirates_pw');
   if (localStorage.getItem('pirates_auth') === PASSWORD_HASH && storedPw) {
     _password = storedPw;
     unlock();
   } else {
-    // Clear stale auth so user sees login screen
     localStorage.removeItem('pirates_auth');
   }
 })();
 
+// ── Data ──
 let SHEET_CSV_URL = null;
-
 let allData = [];
 let raceDates = [];
 let currentChart = null;
+let compareChart = null;
 
 let _initDone = false;
 async function init() {
@@ -379,9 +629,12 @@ async function init() {
     const text = await resp.text();
     parseCSV(text);
     populateDropdown();
+    setupCompare();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    // Handle deep link
+    handleDeepLink();
   } catch (e) {
     _initDone = false;
     document.getElementById('loading').style.display = 'none';
@@ -392,24 +645,17 @@ async function init() {
 
 function parseCSV(text) {
   const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-  // Parse header to get race dates
   const header = parseCSVLine(lines[0]);
-  // Dates start at index 7 (after Lane, Last, First, Age, Event, 24-25 Best, Best)
   raceDates = header.slice(7);
-
   for (let i = 1; i < lines.length; i++) {
     const cols = parseCSVLine(lines[i]);
     if (cols.length < 5) continue;
-    const lane = cols[0];
-    const last = cols[1];
-    const first = cols[2];
-    const age = parseInt(cols[3]) || 0;
-    const event = cols[4];
-    const prevSeasonBest = cols[5] || '';
-    const currentBest = cols[6] || '';
-    const times = cols.slice(7);
-
-    allData.push({ lane, last, first, age, event, prevSeasonBest, currentBest, times });
+    allData.push({
+      lane: cols[0], last: cols[1], first: cols[2],
+      age: parseInt(cols[3]) || 0, event: cols[4],
+      prevSeasonBest: cols[5] || '', currentBest: cols[6] || '',
+      times: cols.slice(7)
+    });
   }
 }
 
@@ -445,7 +691,6 @@ function getSwimmers() {
 function populateDropdown() {
   const sel = document.getElementById('swimmerPicker');
   const swimmers = getSwimmers();
-  // Group by lane
   const groups = {};
   for (const s of swimmers) {
     if (!groups[s.lane]) groups[s.lane] = [];
@@ -463,22 +708,43 @@ function populateDropdown() {
     sel.appendChild(optgroup);
   }
   sel.addEventListener('change', () => {
-    if (sel.value) renderSwimmer(sel.value);
-    else document.getElementById('swimmerView').innerHTML = '';
+    if (sel.value) {
+      renderSwimmer(sel.value);
+      // Update URL without reload
+      const [last, first] = sel.value.split('|');
+      const url = new URL(window.location);
+      url.searchParams.set('swimmer', last + ',' + first);
+      history.replaceState(null, '', url);
+    } else {
+      document.getElementById('swimmerView').innerHTML = '';
+      history.replaceState(null, '', window.location.pathname);
+    }
   });
+}
+
+function handleDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+  const swimmer = params.get('swimmer');
+  if (swimmer) {
+    const [last, first] = swimmer.split(',');
+    const key = last + '|' + first;
+    const sel = document.getElementById('swimmerPicker');
+    if ([...sel.options].some(o => o.value === key)) {
+      sel.value = key;
+      renderSwimmer(key);
+    }
+  }
 }
 
 function parseTime(str) {
   if (!str || str === 'NT' || str === '00:00.00' || str.trim() === '') return null;
   str = str.trim();
-  // Handle MM:SS.ss or M:SS.ss or SS.ss
   const parts = str.split(':');
   if (parts.length === 2) {
     const mins = parseInt(parts[0]);
     const secs = parseFloat(parts[1]);
     if (isNaN(mins) || isNaN(secs)) return null;
     const total = mins * 60 + secs;
-    // Filter out obviously bad data (e.g., 02:29.5 = 149.5s for a 50 free)
     if (total > 120) return null;
     return total;
   }
@@ -493,64 +759,127 @@ function formatTime(secs) {
   return mins > 0 ? mins + ':' + s.padStart(5, '0') : '0:' + s.padStart(5, '0');
 }
 
+function formatDelta(secs) {
+  if (secs == null) return '--';
+  const sign = secs <= 0 ? '' : '+';
+  return sign + secs.toFixed(2);
+}
+
 function getSwimmerRows(key) {
   const [last, first] = key.split('|');
   return allData.filter(r => r.last === last && r.first === first);
 }
 
 const EVENT_COLORS = {
-  '50 Fly': { bg: 'rgba(99,102,241,0.15)', border: '#6366f1' },
-  '50 Back': { bg: 'rgba(16,185,129,0.15)', border: '#10b981' },
+  '50 Fly':    { bg: 'rgba(99,102,241,0.15)', border: '#6366f1' },
+  '50 Back':   { bg: 'rgba(16,185,129,0.15)', border: '#10b981' },
   '50 Breast': { bg: 'rgba(245,158,11,0.15)', border: '#f59e0b' },
-  '50 Free': { bg: 'rgba(37,99,235,0.15)', border: '#2563eb' },
+  '50 Free':   { bg: 'rgba(37,99,235,0.15)',  border: '#2563eb' },
 };
 
+const COMPARE_COLORS = [
+  { border: '#6366f1', bg: 'rgba(99,102,241,0.1)' },
+  { border: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+  { border: '#10b981', bg: 'rgba(16,185,129,0.1)' },
+];
+
+// ── Render ──
 function renderSwimmer(key) {
   const rows = getSwimmerRows(key);
   if (!rows.length) return;
   const info = rows[0];
   const events = [...new Set(rows.map(r => r.event))];
 
-  let html = `
-    <div class="swimmer-header">
-      <h2>${info.first} ${info.last}</h2>
-      <div class="meta">
-        <span class="badge badge-lane">${info.lane}</span>
-        <span class="badge badge-age">Age ${info.age}</span>
-      </div>
-    </div>
-  `;
+  let html = '';
 
-  // Best times summary
-  html += `<div class="card"><h3>Personal Bests</h3>`;
+  // ── Header with share button ──
+  html += `<div class="swimmer-header">
+    <div>
+      <h2>${info.first} ${info.last}</h2>
+    </div>
+    <div class="meta">
+      <span class="badge badge-lane">${info.lane}</span>
+      <span class="badge badge-age">Age ${info.age}</span>
+      <button class="share-btn" onclick="shareSwimmer('${info.last}','${info.first}', this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        Share
+      </button>
+    </div>
+  </div>`;
+
+  // ── Event Improvement Summary ──
+  const lastDateIdx = raceDates.length - 1;
+  let prevDateIdx = -1;
+  // Find second-to-last date this swimmer has data for
+  for (let i = lastDateIdx - 1; i >= 0; i--) {
+    if (rows.some(r => parseTime(r.times[i]) !== null)) { prevDateIdx = i; break; }
+  }
+  const lastMeetDate = raceDates[lastDateIdx];
+  let improved = 0, declined = 0, noChange = 0, noData = 0;
+  let totalDrop = 0;
   for (const ev of events) {
     const row = rows.find(r => r.event === ev);
-    const best = parseTime(row.currentBest);
-    const prevBest = parseTime(row.prevSeasonBest);
-    let improvHtml = '';
-    if (best && prevBest && prevBest > 0) {
-      const diff = best - prevBest;
-      if (diff < 0) {
-        improvHtml = `<span class="improvement positive">${diff.toFixed(2)}s vs last season</span>`;
-      } else if (diff > 0) {
-        improvHtml = `<span class="improvement negative">+${diff.toFixed(2)}s vs last season</span>`;
-      }
+    const lastTime = parseTime(row.times[lastDateIdx]);
+    const prevTime = prevDateIdx >= 0 ? parseTime(row.times[prevDateIdx]) : null;
+    if (lastTime && prevTime) {
+      const diff = lastTime - prevTime;
+      totalDrop += diff;
+      if (diff < -0.01) improved++;
+      else if (diff > 0.01) declined++;
+      else noChange++;
+    } else {
+      noData++;
     }
-    html += `<div class="best-time-row">
-      <span class="event-name">${ev}</span>
-      <span><span class="time">${best ? formatTime(best) : '--'}</span>${improvHtml}</span>
-    </div>`;
   }
-  html += `</div>`;
 
-  // Progress chart
   html += `<div class="card">
-    <h3>Progress Over Time</h3>
+    <h3>Last Meet Summary${lastMeetDate ? ' — ' + lastMeetDate : ''}</h3>
+    <div class="summary-grid">
+      <div class="summary-stat ${improved > 0 ? 'good' : 'neutral'}"><div class="value">${improved}/${events.length}</div><div class="label">Events Improved</div></div>
+      <div class="summary-stat ${declined > 0 ? 'bad' : 'neutral'}"><div class="value">${declined}/${events.length}</div><div class="label">Events Slower</div></div>
+      <div class="summary-stat ${totalDrop < 0 ? 'good' : totalDrop > 0 ? 'bad' : 'neutral'}"><div class="value">${totalDrop <= 0 ? '' : '+'}${totalDrop.toFixed(2)}s</div><div class="label">Total Time Change</div></div>
+    </div>
+  </div>`;
+
+  // ── Personal Bests with standards toggle ──
+  html += `<div class="card">
+    <h3 style="justify-content:space-between;flex-wrap:wrap;">
+      <span>Personal Bests</span>
+      <div class="toggle-row">
+        <span>USA Standards</span>
+        <div class="toggle-switch ${showStandards ? 'on' : ''}" id="stdToggle" onclick="toggleStandards()"></div>
+      </div>
+    </h3>
+    <div id="bestTimesContent">`;
+  html += renderBestTimes(rows, events, info);
+  html += `</div></div>`;
+
+  // ── All Events Chart ──
+  html += `<div class="card">
+    <h3>All Events Progress</h3>
+    <div class="chart-container"><canvas id="allEventsChart"></canvas></div>
+  </div>`;
+
+  // ── Single Event Chart ──
+  html += `<div class="card">
+    <h3>Single Event Progress</h3>
     <div class="event-tabs" id="eventTabs"></div>
     <div class="chart-container"><canvas id="progressChart"></canvas></div>
   </div>`;
 
-  // Rankings section
+  // ── Meet-over-Meet Delta Table ──
+  html += `<div class="card">
+    <h3>Meet-over-Meet Changes</h3>
+    <div class="overflow-x">${renderDeltaTable(rows, events)}</div>
+  </div>`;
+
+  // ── Age Group Percentiles ──
+  html += `<div class="card">
+    <h3>Age Group Percentiles</h3>
+    ${renderPercentiles(key, rows, events, info)}
+  </div>`;
+
+  // ── Rankings section ──
   html += `<div class="card">
     <h3>Team Rankings</h3>
     <div class="view-toggle">
@@ -563,8 +892,12 @@ function renderSwimmer(key) {
   </div>`;
 
   document.getElementById('swimmerView').innerHTML = html;
+  document.getElementById('compareSection').style.display = 'block';
 
-  // Setup event tabs for chart
+  // ── Draw all-events chart ──
+  drawAllEventsChart(key, events);
+
+  // ── Setup single event tabs ──
   const tabsEl = document.getElementById('eventTabs');
   events.forEach((ev, i) => {
     const btn = document.createElement('button');
@@ -579,7 +912,7 @@ function renderSwimmer(key) {
   });
   drawChart(key, events[0]);
 
-  // Setup ranking tabs
+  // ── Ranking tabs ──
   const rankTabsEl = document.getElementById('rankEventTabs');
   events.forEach((ev, i) => {
     const btn = document.createElement('button');
@@ -596,15 +929,192 @@ function renderSwimmer(key) {
   window._currentRankEvent = events[0];
   window._currentRankScope = 'lane';
   drawRanking(key, events[0], 'lane');
+
+  // Pre-fill compare swimmer 1
+  document.getElementById('compare1').value = key;
 }
 
-window.setRankingScope = function(scope, btn) {
-  btn.parentElement.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  window._currentRankScope = scope;
+function renderBestTimes(rows, events, info) {
+  let html = '';
+  for (const ev of events) {
+    const row = rows.find(r => r.event === ev);
+    const best = parseTime(row.currentBest);
+    const prevBest = parseTime(row.prevSeasonBest);
+    let improvHtml = '';
+    if (best && prevBest && prevBest > 0) {
+      const diff = best - prevBest;
+      if (diff < 0) improvHtml = `<span class="improvement positive">${diff.toFixed(2)}s vs last season</span>`;
+      else if (diff > 0) improvHtml = `<span class="improvement negative">+${diff.toFixed(2)}s vs last season</span>`;
+    }
+    let stdHtml = '';
+    if (showStandards && best) {
+      const std = getTimeStandard(info.first, info.age, ev, best);
+      if (std) stdHtml = `<span class="std-badge std-${std}">${std}</span>`;
+      const next = getNextStandard(info.first, info.age, ev, best);
+      if (next) stdHtml += `<span style="font-size:0.7rem;color:var(--gray-500);margin-left:0.35rem">${next.gap.toFixed(2)}s to ${next.level}</span>`;
+    }
+    html += `<div class="best-time-row">
+      <span class="event-name">${ev}</span>
+      <span class="time-info">
+        <span class="time">${best ? formatTime(best) : '--'}</span>
+        ${stdHtml}${improvHtml}
+      </span>
+    </div>`;
+  }
+  return html;
+}
+
+window.toggleStandards = function() {
+  showStandards = !showStandards;
+  const toggle = document.getElementById('stdToggle');
+  if (toggle) toggle.classList.toggle('on', showStandards);
+  // Re-render best times
   const key = document.getElementById('swimmerPicker').value;
-  drawRanking(key, window._currentRankEvent, scope);
+  if (key) {
+    const rows = getSwimmerRows(key);
+    const events = [...new Set(rows.map(r => r.event))];
+    const info = rows[0];
+    document.getElementById('bestTimesContent').innerHTML = renderBestTimes(rows, events, info);
+  }
 };
+
+function renderDeltaTable(rows, events) {
+  // Build table: rows = events, cols = race dates, cells = delta from previous
+  let html = `<table class="delta-table"><thead><tr><th>Event</th>`;
+  for (const d of raceDates) {
+    html += `<th>${d}</th>`;
+  }
+  html += `</tr></thead><tbody>`;
+
+  for (const ev of events) {
+    const row = rows.find(r => r.event === ev);
+    html += `<tr><td class="event-col">${ev.replace('50 ', '')}</td>`;
+    let prevTime = null;
+    // Find best up to that point for PB detection
+    let bestSoFar = Infinity;
+    for (let i = 0; i < raceDates.length; i++) {
+      const t = parseTime(row.times[i]);
+      if (t === null) {
+        html += `<td class="delta-na">--</td>`;
+      } else {
+        const isPB = t < bestSoFar;
+        if (t < bestSoFar) bestSoFar = t;
+        if (prevTime === null) {
+          html += `<td>${formatTime(t)}${isPB ? '<span class="delta-pb"> PB</span>' : ''}</td>`;
+        } else {
+          const delta = t - prevTime;
+          const cls = delta < -0.01 ? 'delta-pos' : delta > 0.01 ? 'delta-neg' : '';
+          html += `<td><span class="${cls}">${formatDelta(delta)}</span>${isPB ? '<span class="delta-pb"> PB</span>' : ''}</td>`;
+        }
+        prevTime = t;
+      }
+    }
+    html += `</tr>`;
+  }
+  html += `</tbody></table>`;
+  return html;
+}
+
+function renderPercentiles(key, rows, events, info) {
+  // Calculate percentile among same-age swimmers for each event
+  let html = '';
+  for (const ev of events) {
+    const row = rows.find(r => r.event === ev);
+    const best = parseTime(row.currentBest);
+    if (!best || best <= 0) {
+      html += `<div class="best-time-row"><span class="event-name">${ev}</span><span class="percentile-text">No data</span></div>`;
+      continue;
+    }
+
+    // All swimmers same age with valid best for this event
+    const sameAge = allData.filter(r => r.age === info.age && r.event === ev);
+    const times = [];
+    const seen = new Set();
+    for (const r of sameAge) {
+      const k = r.last + '|' + r.first;
+      if (seen.has(k)) continue;
+      seen.add(k);
+      const t = parseTime(r.currentBest);
+      if (t && t > 0) times.push(t);
+    }
+    times.sort((a, b) => a - b);
+    const rank = times.indexOf(best) + 1;
+    const pct = Math.round((1 - (rank - 1) / times.length) * 100);
+    const barWidth = Math.max(5, pct);
+
+    html += `<div class="best-time-row">
+      <span class="event-name">${ev}</span>
+      <span style="display:flex;align-items:center;">
+        <span style="font-size:0.8rem;font-weight:600;min-width:2rem;text-align:right;">#${rank}</span>
+        <span style="font-size:0.75rem;color:var(--gray-500);margin:0 0.5rem;">of ${times.length}</span>
+        <span class="percentile-bar-container"><span class="percentile-bar" style="width:${barWidth}%"></span></span>
+        <span class="percentile-text">Top ${pct <= 0 ? 1 : pct}%</span>
+      </span>
+    </div>`;
+  }
+  return html;
+}
+
+// ── Share ──
+window.shareSwimmer = function(last, first, btn) {
+  const url = new URL(window.location);
+  url.searchParams.set('swimmer', last + ',' + first);
+  navigator.clipboard.writeText(url.toString()).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share';
+    }, 2000);
+  });
+};
+
+// ── Charts ──
+function drawAllEventsChart(key, events) {
+  const rows = getSwimmerRows(key);
+  const datasets = [];
+  for (const ev of events) {
+    const row = rows.find(r => r.event === ev);
+    if (!row) continue;
+    const colors = EVENT_COLORS[ev];
+    const data = [];
+    for (let i = 0; i < raceDates.length; i++) {
+      data.push(parseTime(row.times[i]));
+    }
+    datasets.push({
+      label: ev,
+      data,
+      borderColor: colors.border,
+      backgroundColor: colors.bg,
+      borderWidth: 2,
+      pointRadius: 4,
+      pointBackgroundColor: colors.border,
+      spanGaps: true,
+      tension: 0.3,
+    });
+  }
+
+  const ctx = document.getElementById('allEventsChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels: raceDates, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + formatTime(ctx.parsed.y) } }
+      },
+      scales: {
+        y: {
+          reverse: true,
+          title: { display: true, text: 'Time (lower is better)' },
+          ticks: { callback: v => formatTime(v) }
+        }
+      }
+    }
+  });
+}
 
 function drawChart(key, event) {
   const rows = getSwimmerRows(key);
@@ -646,24 +1156,27 @@ function drawChart(key, event) {
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => formatTime(ctx.parsed.y)
-          }
-        }
+        tooltip: { callbacks: { label: ctx => formatTime(ctx.parsed.y) } }
       },
       scales: {
         y: {
           reverse: true,
           title: { display: true, text: 'Time (lower is better)' },
-          ticks: {
-            callback: v => formatTime(v)
-          }
+          ticks: { callback: v => formatTime(v) }
         }
       }
     }
   });
 }
+
+// ── Rankings ──
+window.setRankingScope = function(scope, btn) {
+  btn.parentElement.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window._currentRankScope = scope;
+  const key = document.getElementById('swimmerPicker').value;
+  drawRanking(key, window._currentRankEvent, scope);
+};
 
 function drawRanking(selectedKey, event, scope) {
   const [selLast, selFirst] = selectedKey.split('|');
@@ -671,13 +1184,9 @@ function drawRanking(selectedKey, event, scope) {
   if (!selRow) return;
 
   let candidates = allData.filter(r => r.event === event);
-  if (scope === 'lane') {
-    candidates = candidates.filter(r => r.lane === selRow.lane);
-  } else if (scope === 'age') {
-    candidates = candidates.filter(r => r.age === selRow.age);
-  }
+  if (scope === 'lane') candidates = candidates.filter(r => r.lane === selRow.lane);
+  else if (scope === 'age') candidates = candidates.filter(r => r.age === selRow.age);
 
-  // Get best time per swimmer for this event
   const swimmerBests = [];
   const seen = new Set();
   for (const r of candidates) {
@@ -685,9 +1194,7 @@ function drawRanking(selectedKey, event, scope) {
     if (seen.has(k)) continue;
     seen.add(k);
     const best = parseTime(r.currentBest);
-    if (best && best > 0) {
-      swimmerBests.push({ key: k, first: r.first, last: r.last, age: r.age, lane: r.lane, best });
-    }
+    if (best && best > 0) swimmerBests.push({ key: k, first: r.first, last: r.last, age: r.age, lane: r.lane, best });
   }
   swimmerBests.sort((a, b) => a.best - b.best);
 
@@ -705,8 +1212,101 @@ function drawRanking(selectedKey, event, scope) {
     </tr>`;
   });
   tableHtml += `</tbody></table>`;
-
   document.getElementById('rankingTable').innerHTML = tableHtml;
+}
+
+// ── Compare ──
+function setupCompare() {
+  const swimmers = getSwimmers();
+  ['compare1','compare2','compare3'].forEach(id => {
+    const sel = document.getElementById(id);
+    const groups = {};
+    for (const s of swimmers) {
+      if (!groups[s.lane]) groups[s.lane] = [];
+      groups[s.lane].push(s);
+    }
+    for (const lane of Object.keys(groups).sort()) {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = lane;
+      for (const s of groups[lane]) {
+        const opt = document.createElement('option');
+        opt.value = s.last + '|' + s.first;
+        opt.textContent = s.first + ' ' + s.last + ' (age ' + s.age + ')';
+        optgroup.appendChild(opt);
+      }
+      sel.appendChild(optgroup);
+    }
+    sel.addEventListener('change', drawCompareChart);
+  });
+
+  // Setup compare event tabs (we'll create them once data is loaded)
+  const events = [...new Set(allData.map(r => r.event))];
+  const tabsEl = document.getElementById('compareEventTabs');
+  events.forEach((ev, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'event-tab' + (i === 0 ? ' active' : '');
+    btn.textContent = ev.replace('50 ', '');
+    btn.dataset.event = ev;
+    btn.onclick = () => {
+      tabsEl.querySelectorAll('.event-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      drawCompareChart();
+    };
+    tabsEl.appendChild(btn);
+  });
+}
+
+function drawCompareChart() {
+  const keys = ['compare1','compare2','compare3'].map(id => document.getElementById(id).value).filter(Boolean);
+  if (keys.length < 2) return;
+
+  const activeTab = document.querySelector('#compareEventTabs .event-tab.active');
+  const event = activeTab ? activeTab.dataset.event : '50 Free';
+
+  const datasets = [];
+  keys.forEach((key, idx) => {
+    const [last, first] = key.split('|');
+    const row = allData.find(r => r.last === last && r.first === first && r.event === event);
+    if (!row) return;
+    const data = [];
+    for (let i = 0; i < raceDates.length; i++) {
+      data.push(parseTime(row.times[i]));
+    }
+    const colors = COMPARE_COLORS[idx];
+    datasets.push({
+      label: first + ' ' + last,
+      data,
+      borderColor: colors.border,
+      backgroundColor: colors.bg,
+      borderWidth: 2.5,
+      pointRadius: 5,
+      pointBackgroundColor: colors.border,
+      spanGaps: true,
+      tension: 0.3,
+    });
+  });
+
+  if (compareChart) compareChart.destroy();
+  const ctx = document.getElementById('compareChart').getContext('2d');
+  compareChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: raceDates, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + formatTime(ctx.parsed.y) } }
+      },
+      scales: {
+        y: {
+          reverse: true,
+          title: { display: true, text: 'Time (lower is better)' },
+          ticks: { callback: v => formatTime(v) }
+        }
+      }
+    }
+  });
 }
 
 init();
