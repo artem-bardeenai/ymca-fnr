@@ -253,6 +253,7 @@
     height: 100%;
     border-radius: 3px;
     background: var(--blue);
+    display: block;
   }
   .percentile-text {
     font-size: 0.7rem;
@@ -378,41 +379,6 @@
   }
   .toggle-switch.on::after { transform: translateX(16px); }
 
-  .compare-section {
-    background: white;
-    border-radius: 12px;
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
-  .compare-section label { font-weight: 600; font-size: 0.875rem; color: var(--gray-700); display: block; margin-bottom: 0.5rem; }
-  .compare-swimmers {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .compare-swimmers select {
-    flex: 1;
-    min-width: 180px;
-    padding: 0.5rem;
-    border: 2px solid var(--gray-200);
-    border-radius: 8px;
-    font-size: 0.875rem;
-    background: white;
-  }
-  .compare-swimmers select:focus { outline: none; border-color: var(--blue); }
-  .compare-btn {
-    padding: 0.5rem 1rem;
-    background: var(--purple);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .compare-btn:hover { opacity: 0.9; }
 
   footer {
     text-align: center;
@@ -464,18 +430,6 @@
     </div>
     <div id="swimmerView"></div>
 
-    <div class="compare-section" id="compareSection" style="display:none">
-      <label>Compare Swimmers</label>
-      <div class="compare-swimmers">
-        <select id="compare1" class="swimmer-select" style="padding:0.5rem"><option value="">Swimmer 1</option></select>
-        <select id="compare2" class="swimmer-select" style="padding:0.5rem"><option value="">Swimmer 2</option></select>
-        <select id="compare3" class="swimmer-select" style="padding:0.5rem"><option value="">Swimmer 3 (optional)</option></select>
-      </div>
-      <div style="margin-top:1rem">
-        <div class="event-tabs" id="compareEventTabs"></div>
-        <div class="chart-container"><canvas id="compareChart"></canvas></div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -487,8 +441,8 @@
 
 <script>
 const PASSWORD_HASH = 'b7e88684a8ca4218479e815ed6546d69ec1d2fa16de5e7b5d6a1f05f87c74fbf';
-const ENC_CSV_URL = 'ZJw5LRLcelNO+JxqMcEyjUuv2WhyCGmQ/MSGIB9EI7Y1kM7DdckExtEo2IKuVTB02sl/AOwb9J9MeuWYfXf59tjkx8Qfnl1A8EB2YAiVNur2yhA/lcO6Yac3LQdaGSVX7g3KevZvVCSMhtUnmbjaV0TgSyBXuHnNBTFiXQLACLniWjh9t9RaQMC6HXp2vI6B';
-const ENC_EDIT_URL = '/oGEEVNFwhxEG+0f4SHivBNHaTIeFF+wkXiEqrFmkp7n/WdR8/vLQvluTAigFgUv6v481LKJUTI72SpVbEbA4Qsp+k90DenPJg+XPdwsZkfKTrR+ipMnZkmv0rfguFU80YzrscYqqgAilvXJFaRulf8SLjOQlYBgbikSvSl1z+o/5AfR/2aQk8HUk6RsZEzTqDE=';
+const ENC_CSV_URL = 'K/3rC6KVfE1D6ILHuXo05Ce9cc6E4wYD4nOS8nNoUxwHHyM6uNVQWWb6kMB9CqUt2mwKQPFma/r2U6J3m4LUQijm12r6tGLUs7DFb0QWiAiYGq5ns1vwTzi1XarVKjDB+tBqsW2oFuTEJlRcx6SogHUO2CSa9su8nS5wbTWs2DAR8UI4O+oaZZHb7l3rSwq+';
+const ENC_EDIT_URL = 'vpcxtMEXiYqHvbcrWmd5KyaC/MP++fe59jL6Av3jtkKemu6kt7KYkpL8+jONtkFSjHOakdmE6Sf5UgBeTuCq0D9SYUmnIakhTt+XiHocwiPUrrVFbPspSHVSbjaQ493nFxCHyzSjVUk1ZUNx3YlYm2vx6x+HlHDkyibzvmSMbT/Jy0e2U0F3UCBPE0FfCi9iq8c=';
 
 // ── USA Swimming 2024-2025 SCY Motivational Time Standards ──
 // Format: TIME_STANDARDS[gender][ageGroup][event][level] = seconds
@@ -614,7 +568,6 @@ let SHEET_CSV_URL = null;
 let allData = [];
 let raceDates = [];
 let currentChart = null;
-let compareChart = null;
 
 let _initDone = false;
 async function init() {
@@ -629,7 +582,6 @@ async function init() {
     const text = await resp.text();
     parseCSV(text);
     populateDropdown();
-    setupCompare();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').style.display = 'none';
     document.getElementById('app').style.display = 'block';
@@ -777,11 +729,6 @@ const EVENT_COLORS = {
   '50 Free':   { bg: 'rgba(37,99,235,0.15)',  border: '#2563eb' },
 };
 
-const COMPARE_COLORS = [
-  { border: '#6366f1', bg: 'rgba(99,102,241,0.1)' },
-  { border: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
-  { border: '#10b981', bg: 'rgba(16,185,129,0.1)' },
-];
 
 // ── Render ──
 function renderSwimmer(key) {
@@ -892,8 +839,6 @@ function renderSwimmer(key) {
   </div>`;
 
   document.getElementById('swimmerView').innerHTML = html;
-  document.getElementById('compareSection').style.display = 'block';
-
   // ── Draw all-events chart ──
   drawAllEventsChart(key, events);
 
@@ -930,8 +875,6 @@ function renderSwimmer(key) {
   window._currentRankScope = 'lane';
   drawRanking(key, events[0], 'lane');
 
-  // Pre-fill compare swimmer 1
-  document.getElementById('compare1').value = key;
 }
 
 function renderBestTimes(rows, events, info) {
@@ -1216,99 +1159,6 @@ function drawRanking(selectedKey, event, scope) {
 }
 
 // ── Compare ──
-function setupCompare() {
-  const swimmers = getSwimmers();
-  ['compare1','compare2','compare3'].forEach(id => {
-    const sel = document.getElementById(id);
-    const groups = {};
-    for (const s of swimmers) {
-      if (!groups[s.lane]) groups[s.lane] = [];
-      groups[s.lane].push(s);
-    }
-    for (const lane of Object.keys(groups).sort()) {
-      const optgroup = document.createElement('optgroup');
-      optgroup.label = lane;
-      for (const s of groups[lane]) {
-        const opt = document.createElement('option');
-        opt.value = s.last + '|' + s.first;
-        opt.textContent = s.first + ' ' + s.last + ' (age ' + s.age + ')';
-        optgroup.appendChild(opt);
-      }
-      sel.appendChild(optgroup);
-    }
-    sel.addEventListener('change', drawCompareChart);
-  });
-
-  // Setup compare event tabs (we'll create them once data is loaded)
-  const events = [...new Set(allData.map(r => r.event))];
-  const tabsEl = document.getElementById('compareEventTabs');
-  events.forEach((ev, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'event-tab' + (i === 0 ? ' active' : '');
-    btn.textContent = ev.replace('50 ', '');
-    btn.dataset.event = ev;
-    btn.onclick = () => {
-      tabsEl.querySelectorAll('.event-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      drawCompareChart();
-    };
-    tabsEl.appendChild(btn);
-  });
-}
-
-function drawCompareChart() {
-  const keys = ['compare1','compare2','compare3'].map(id => document.getElementById(id).value).filter(Boolean);
-  if (keys.length < 2) return;
-
-  const activeTab = document.querySelector('#compareEventTabs .event-tab.active');
-  const event = activeTab ? activeTab.dataset.event : '50 Free';
-
-  const datasets = [];
-  keys.forEach((key, idx) => {
-    const [last, first] = key.split('|');
-    const row = allData.find(r => r.last === last && r.first === first && r.event === event);
-    if (!row) return;
-    const data = [];
-    for (let i = 0; i < raceDates.length; i++) {
-      data.push(parseTime(row.times[i]));
-    }
-    const colors = COMPARE_COLORS[idx];
-    datasets.push({
-      label: first + ' ' + last,
-      data,
-      borderColor: colors.border,
-      backgroundColor: colors.bg,
-      borderWidth: 2.5,
-      pointRadius: 5,
-      pointBackgroundColor: colors.border,
-      spanGaps: true,
-      tension: 0.3,
-    });
-  });
-
-  if (compareChart) compareChart.destroy();
-  const ctx = document.getElementById('compareChart').getContext('2d');
-  compareChart = new Chart(ctx, {
-    type: 'line',
-    data: { labels: raceDates, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
-        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + formatTime(ctx.parsed.y) } }
-      },
-      scales: {
-        y: {
-          reverse: true,
-          title: { display: true, text: 'Time (lower is better)' },
-          ticks: { callback: v => formatTime(v) }
-        }
-      }
-    }
-  });
-}
-
 init();
 </script>
 </body>
