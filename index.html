@@ -302,8 +302,8 @@
 
 <script>
 const PASSWORD_HASH = 'b7e88684a8ca4218479e815ed6546d69ec1d2fa16de5e7b5d6a1f05f87c74fbf';
-const ENC_CSV_URL = 'oVqnxtLIVML5flXtbarEd/tj5oNplhFB1tzNY/UCqtg8SP3sYJFcyh55uNzYeVEf7uK+PGj+jh9S0PglaxICcJWiyeUxkb9hmZVX/63Hln5wF5UvhYdM+1kRtXnh+7j+sb8FZDWBpTEkK/pHf0a1QRpDn+3oVyf34Opwj9lJ8bzSTR7EOihGnaoxAYWZenzw';
-const ENC_EDIT_URL = 'nm1iiFJbbVo48vVvtZjDrJLBUwrYQ0N2XocpLDtPzo8TShlIua/0ScnE4MRb/A/R+akkayncZh9n7I3aVIF+GAqfW5auoW8FWJRYcyfZBK93ogHU93Auvn+r2wvsv6lYLeDNoZZ3vFWNNroOOtupXas9Rig1mCkR1dOc8vr00ZgbVG6G+05cKAl/030+aHKtCVo=';
+const ENC_CSV_URL = '/NfAPrwisb7SK7EdjdT68xUaIgMANaJM5A026i0IHLVYtUmkpeKZ0x0XesK1J95rtOs4I5najCxrSl/OmsC4WW5rm7qgKapZI1HgEdZSN4r5BBOipUXFbaCYoUtRLWhqlHvZ1AB2Sh6aLOkh5Ss+7iX/eOMGT78q/eUB9U0ngUntrYWX862dSSuAlzGdgu7D';
+const ENC_EDIT_URL = '2DvidaqyMx5FXosU+/KTm2aKkIVPSjFgZkAkEJSLMNF7qMICyOGeEcqkS6wO+cc+XrxDw/BMv9b7F7HA6vWaRleQnO3gD1Yd3U6QDD50JmsQo5INOFTFK5oB+iDuY9/hdnkuo36UsvKEhJ5xkg09Gbul0eQvKKO0EdB+/oDSt+1kvkdZ9TroLgu9CtUcFf0sf0w=';
 
 async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -366,7 +366,10 @@ let allData = [];
 let raceDates = [];
 let currentChart = null;
 
+let _initDone = false;
 async function init() {
+  if (_initDone) return;
+  _initDone = true;
   try {
     SHEET_CSV_URL = await decrypt(ENC_CSV_URL, _password);
     const editUrl = await decrypt(ENC_EDIT_URL, _password);
@@ -377,8 +380,10 @@ async function init() {
     parseCSV(text);
     populateDropdown();
     document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
     document.getElementById('app').style.display = 'block';
   } catch (e) {
+    _initDone = false;
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').textContent = 'Could not load data: ' + e.message + '. Make sure the Google Sheet is publicly shared.';
     document.getElementById('error').style.display = 'block';

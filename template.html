@@ -366,7 +366,10 @@ let allData = [];
 let raceDates = [];
 let currentChart = null;
 
+let _initDone = false;
 async function init() {
+  if (_initDone) return;
+  _initDone = true;
   try {
     SHEET_CSV_URL = await decrypt(ENC_CSV_URL, _password);
     const editUrl = await decrypt(ENC_EDIT_URL, _password);
@@ -377,8 +380,10 @@ async function init() {
     parseCSV(text);
     populateDropdown();
     document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
     document.getElementById('app').style.display = 'block';
   } catch (e) {
+    _initDone = false;
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').textContent = 'Could not load data: ' + e.message + '. Make sure the Google Sheet is publicly shared.';
     document.getElementById('error').style.display = 'block';
