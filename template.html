@@ -348,11 +348,15 @@ async function unlock() {
   init();
 }
 
-// Auto-unlock if previously authenticated
+// Auto-unlock if previously authenticated (need both hash and password)
 (async () => {
-  if (localStorage.getItem('pirates_auth') === PASSWORD_HASH) {
-    _password = localStorage.getItem('pirates_pw');
+  const storedPw = localStorage.getItem('pirates_pw');
+  if (localStorage.getItem('pirates_auth') === PASSWORD_HASH && storedPw) {
+    _password = storedPw;
     unlock();
+  } else {
+    // Clear stale auth so user sees login screen
+    localStorage.removeItem('pirates_auth');
   }
 })();
 

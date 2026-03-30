@@ -302,8 +302,8 @@
 
 <script>
 const PASSWORD_HASH = 'b7e88684a8ca4218479e815ed6546d69ec1d2fa16de5e7b5d6a1f05f87c74fbf';
-const ENC_CSV_URL = '8xXegPbJJrJ8TwRHBgxwHbClMI8kbcM0kAzXOcH8XRkMKUohuNf9/wvPuMmXiNmFmIlooBeZvsJRUotHE/yrBUr1ZcqzgJLLWyPr1POBCiiIZ+jNz/5Kv68+p0QgeE+aKbDJ8/Vqk9NOyXQxmT8xPOD1uq+ol4Kk1MmdOTcGHI1WRl+KzMOBbhnHc3d/qy5D';
-const ENC_EDIT_URL = 'YofprERT0xA6A8/QTpy5IHAtHzcaA1gP8rfR77Brd6TmCgJKqTT+za1akv8vzQmzQxIX1UilbO0G5hVOWUJjscIWH6Ci368Rxjc0fn3sE1C3P+r2IUsOw9IYAIDAYMpFivrxJUo716vmgmzbmUc/opkYkTzJgb7RaF8N9MJlNipKeqBs9ljgIWEZgGOQ3xUxWME=';
+const ENC_CSV_URL = 'oVqnxtLIVML5flXtbarEd/tj5oNplhFB1tzNY/UCqtg8SP3sYJFcyh55uNzYeVEf7uK+PGj+jh9S0PglaxICcJWiyeUxkb9hmZVX/63Hln5wF5UvhYdM+1kRtXnh+7j+sb8FZDWBpTEkK/pHf0a1QRpDn+3oVyf34Opwj9lJ8bzSTR7EOihGnaoxAYWZenzw';
+const ENC_EDIT_URL = 'nm1iiFJbbVo48vVvtZjDrJLBUwrYQ0N2XocpLDtPzo8TShlIua/0ScnE4MRb/A/R+akkayncZh9n7I3aVIF+GAqfW5auoW8FWJRYcyfZBK93ogHU93Auvn+r2wvsv6lYLeDNoZZ3vFWNNroOOtupXas9Rig1mCkR1dOc8vr00ZgbVG6G+05cKAl/030+aHKtCVo=';
 
 async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -348,11 +348,15 @@ async function unlock() {
   init();
 }
 
-// Auto-unlock if previously authenticated
+// Auto-unlock if previously authenticated (need both hash and password)
 (async () => {
-  if (localStorage.getItem('pirates_auth') === PASSWORD_HASH) {
-    _password = localStorage.getItem('pirates_pw');
+  const storedPw = localStorage.getItem('pirates_pw');
+  if (localStorage.getItem('pirates_auth') === PASSWORD_HASH && storedPw) {
+    _password = storedPw;
     unlock();
+  } else {
+    // Clear stale auth so user sees login screen
+    localStorage.removeItem('pirates_auth');
   }
 })();
 
