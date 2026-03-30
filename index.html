@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YMCA Pirates Swim Team - Friday Night Races</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1a2744;
+    --blue: #2563eb;
+    --light-blue: #dbeafe;
+    --gold: #f59e0b;
+    --green: #10b981;
+    --red: #ef4444;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.5;
+  }
+
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 1.5rem 1rem;
+    text-align: center;
+  }
+  header h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+  header h1 span { color: var(--gold); }
+  header p { color: var(--gray-300); font-size: 0.875rem; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 1rem; }
+
+  .search-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .search-section label { font-weight: 600; font-size: 0.875rem; color: var(--gray-700); display: block; margin-bottom: 0.5rem; }
+
+  .swimmer-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+  }
+  .swimmer-select:focus { outline: none; border-color: var(--blue); }
+
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--gray-500);
+    font-size: 1.1rem;
+  }
+  .loading .spinner {
+    display: inline-block;
+    width: 24px; height: 24px;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-msg {
+    background: #fef2f2;
+    color: var(--red);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .swimmer-header {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .swimmer-header h2 { font-size: 1.25rem; }
+  .swimmer-header .meta { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-lane { background: var(--light-blue); color: var(--blue); }
+  .badge-age { background: #fef3c7; color: #92400e; }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .card h3 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .event-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .event-tab {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .event-tab:hover { border-color: var(--blue); color: var(--blue); }
+  .event-tab.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+  .chart-container { position: relative; height: 280px; margin-bottom: 0.5rem; }
+
+  .best-time-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .best-time-row:last-child { border-bottom: none; }
+  .best-time-row .event-name { font-weight: 500; font-size: 0.875rem; }
+  .best-time-row .time { font-weight: 700; font-family: 'SF Mono', 'Fira Code', monospace; }
+  .improvement { font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem; }
+  .improvement.positive { color: var(--green); }
+  .improvement.negative { color: var(--red); }
+
+  .ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .ranking-table th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 2px solid var(--gray-200);
+    font-weight: 600;
+    color: var(--gray-500);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+  .ranking-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .ranking-table tr.highlight { background: #eff6ff; }
+  .ranking-table .rank { font-weight: 700; color: var(--gray-500); width: 3rem; }
+  .ranking-table .rank-1 { color: var(--gold); }
+  .ranking-table .rank-2 { color: #9ca3af; }
+  .ranking-table .rank-3 { color: #b45309; }
+  .ranking-table .time-cell { font-family: 'SF Mono', 'Fira Code', monospace; font-weight: 600; }
+
+  .view-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .view-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  .view-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+  footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--gray-500);
+    font-size: 0.75rem;
+  }
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .swimmer-header { flex-direction: column; align-items: flex-start; }
+    .chart-container { height: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>YMCA <span>Pirates</span> Swim Team</h1>
+  <p>Friday Night Races - Progress Tracker</p>
+</header>
+
+<div class="container">
+  <div id="loading" class="loading">
+    <span class="spinner"></span> Loading data from Google Sheets...
+  </div>
+  <div id="error" class="error-msg" style="display:none"></div>
+  <div id="app" style="display:none">
+    <div class="search-section">
+      <label for="swimmerPicker">Select a Swimmer</label>
+      <select id="swimmerPicker" class="swimmer-select">
+        <option value="">-- Choose a swimmer --</option>
+      </select>
+    </div>
+    <div id="swimmerView"></div>
+  </div>
+</div>
+
+<footer>
+  YMCA Pirates Swim Team &middot; Data sourced live from
+  <a href="https://docs.google.com/spreadsheets/d/1yYNsg_B4ou_bbF5IUYJFGcpevblUjMT0RAQajoXjQRo/edit?gid=1352731412#gid=1352731412" target="_blank" rel="noopener">this Google Sheet</a>
+</footer>
+
+<script>
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1yYNsg_B4ou_bbF5IUYJFGcpevblUjMT0RAQajoXjQRo/export?format=csv&gid=1352731412';
+
+let allData = [];
+let raceDates = [];
+let currentChart = null;
+
+async function init() {
+  try {
+    const resp = await fetch(SHEET_CSV_URL);
+    if (!resp.ok) throw new Error('Failed to fetch sheet');
+    const text = await resp.text();
+    parseCSV(text);
+    populateDropdown();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  } catch (e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').textContent = 'Could not load data: ' + e.message + '. Make sure the Google Sheet is publicly shared.';
+    document.getElementById('error').style.display = 'block';
+  }
+}
+
+function parseCSV(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+  // Parse header to get race dates
+  const header = parseCSVLine(lines[0]);
+  // Dates start at index 7 (after Lane, Last, First, Age, Event, 24-25 Best, Best)
+  raceDates = header.slice(7);
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = parseCSVLine(lines[i]);
+    if (cols.length < 5) continue;
+    const lane = cols[0];
+    const last = cols[1];
+    const first = cols[2];
+    const age = parseInt(cols[3]) || 0;
+    const event = cols[4];
+    const prevSeasonBest = cols[5] || '';
+    const currentBest = cols[6] || '';
+    const times = cols.slice(7);
+
+    allData.push({ lane, last, first, age, event, prevSeasonBest, currentBest, times });
+  }
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"' && line[i+1] === '"') { current += '"'; i++; }
+      else if (ch === '"') { inQuotes = false; }
+      else { current += ch; }
+    } else {
+      if (ch === '"') { inQuotes = true; }
+      else if (ch === ',') { result.push(current); current = ''; }
+      else { current += ch; }
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+function getSwimmers() {
+  const map = new Map();
+  for (const row of allData) {
+    const key = row.last + '|' + row.first;
+    if (!map.has(key)) map.set(key, { first: row.first, last: row.last, age: row.age, lane: row.lane });
+  }
+  return [...map.values()].sort((a, b) => (a.first + ' ' + a.last).localeCompare(b.first + ' ' + b.last));
+}
+
+function populateDropdown() {
+  const sel = document.getElementById('swimmerPicker');
+  const swimmers = getSwimmers();
+  // Group by lane
+  const groups = {};
+  for (const s of swimmers) {
+    if (!groups[s.lane]) groups[s.lane] = [];
+    groups[s.lane].push(s);
+  }
+  for (const lane of Object.keys(groups).sort()) {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = lane;
+    for (const s of groups[lane]) {
+      const opt = document.createElement('option');
+      opt.value = s.last + '|' + s.first;
+      opt.textContent = s.first + ' ' + s.last + ' (age ' + s.age + ')';
+      optgroup.appendChild(opt);
+    }
+    sel.appendChild(optgroup);
+  }
+  sel.addEventListener('change', () => {
+    if (sel.value) renderSwimmer(sel.value);
+    else document.getElementById('swimmerView').innerHTML = '';
+  });
+}
+
+function parseTime(str) {
+  if (!str || str === 'NT' || str === '00:00.00' || str.trim() === '') return null;
+  str = str.trim();
+  // Handle MM:SS.ss or M:SS.ss or SS.ss
+  const parts = str.split(':');
+  if (parts.length === 2) {
+    const mins = parseInt(parts[0]);
+    const secs = parseFloat(parts[1]);
+    if (isNaN(mins) || isNaN(secs)) return null;
+    const total = mins * 60 + secs;
+    // Filter out obviously bad data (e.g., 02:29.5 = 149.5s for a 50 free)
+    if (total > 120) return null;
+    return total;
+  }
+  const val = parseFloat(str);
+  return isNaN(val) ? null : val;
+}
+
+function formatTime(secs) {
+  if (secs == null) return '--';
+  const mins = Math.floor(secs / 60);
+  const s = (secs % 60).toFixed(2);
+  return mins > 0 ? mins + ':' + s.padStart(5, '0') : '0:' + s.padStart(5, '0');
+}
+
+function getSwimmerRows(key) {
+  const [last, first] = key.split('|');
+  return allData.filter(r => r.last === last && r.first === first);
+}
+
+const EVENT_COLORS = {
+  '50 Fly': { bg: 'rgba(99,102,241,0.15)', border: '#6366f1' },
+  '50 Back': { bg: 'rgba(16,185,129,0.15)', border: '#10b981' },
+  '50 Breast': { bg: 'rgba(245,158,11,0.15)', border: '#f59e0b' },
+  '50 Free': { bg: 'rgba(37,99,235,0.15)', border: '#2563eb' },
+};
+
+function renderSwimmer(key) {
+  const rows = getSwimmerRows(key);
+  if (!rows.length) return;
+  const info = rows[0];
+  const events = [...new Set(rows.map(r => r.event))];
+
+  let html = `
+    <div class="swimmer-header">
+      <h2>${info.first} ${info.last}</h2>
+      <div class="meta">
+        <span class="badge badge-lane">${info.lane}</span>
+        <span class="badge badge-age">Age ${info.age}</span>
+      </div>
+    </div>
+  `;
+
+  // Best times summary
+  html += `<div class="card"><h3>Personal Bests</h3>`;
+  for (const ev of events) {
+    const row = rows.find(r => r.event === ev);
+    const best = parseTime(row.currentBest);
+    const prevBest = parseTime(row.prevSeasonBest);
+    let improvHtml = '';
+    if (best && prevBest && prevBest > 0) {
+      const diff = best - prevBest;
+      if (diff < 0) {
+        improvHtml = `<span class="improvement positive">${diff.toFixed(2)}s vs last season</span>`;
+      } else if (diff > 0) {
+        improvHtml = `<span class="improvement negative">+${diff.toFixed(2)}s vs last season</span>`;
+      }
+    }
+    html += `<div class="best-time-row">
+      <span class="event-name">${ev}</span>
+      <span><span class="time">${best ? formatTime(best) : '--'}</span>${improvHtml}</span>
+    </div>`;
+  }
+  html += `</div>`;
+
+  // Progress chart
+  html += `<div class="card">
+    <h3>Progress Over Time</h3>
+    <div class="event-tabs" id="eventTabs"></div>
+    <div class="chart-container"><canvas id="progressChart"></canvas></div>
+  </div>`;
+
+  // Rankings section
+  html += `<div class="card">
+    <h3>Team Rankings</h3>
+    <div class="view-toggle">
+      <button class="view-btn active" data-scope="lane" onclick="setRankingScope('lane', this)">Same Group</button>
+      <button class="view-btn" data-scope="age" onclick="setRankingScope('age', this)">Same Age</button>
+      <button class="view-btn" data-scope="all" onclick="setRankingScope('all', this)">All Swimmers</button>
+    </div>
+    <div class="event-tabs" id="rankEventTabs"></div>
+    <div id="rankingTable"></div>
+  </div>`;
+
+  document.getElementById('swimmerView').innerHTML = html;
+
+  // Setup event tabs for chart
+  const tabsEl = document.getElementById('eventTabs');
+  events.forEach((ev, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'event-tab' + (i === 0 ? ' active' : '');
+    btn.textContent = ev.replace('50 ', '');
+    btn.onclick = () => {
+      tabsEl.querySelectorAll('.event-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      drawChart(key, ev);
+    };
+    tabsEl.appendChild(btn);
+  });
+  drawChart(key, events[0]);
+
+  // Setup ranking tabs
+  const rankTabsEl = document.getElementById('rankEventTabs');
+  events.forEach((ev, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'event-tab' + (i === 0 ? ' active' : '');
+    btn.textContent = ev.replace('50 ', '');
+    btn.onclick = () => {
+      rankTabsEl.querySelectorAll('.event-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      window._currentRankEvent = ev;
+      drawRanking(key, ev, window._currentRankScope || 'lane');
+    };
+    rankTabsEl.appendChild(btn);
+  });
+  window._currentRankEvent = events[0];
+  window._currentRankScope = 'lane';
+  drawRanking(key, events[0], 'lane');
+}
+
+window.setRankingScope = function(scope, btn) {
+  btn.parentElement.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window._currentRankScope = scope;
+  const key = document.getElementById('swimmerPicker').value;
+  drawRanking(key, window._currentRankEvent, scope);
+};
+
+function drawChart(key, event) {
+  const rows = getSwimmerRows(key);
+  const row = rows.find(r => r.event === event);
+  if (!row) return;
+
+  const labels = [];
+  const data = [];
+  for (let i = 0; i < raceDates.length; i++) {
+    const t = parseTime(row.times[i]);
+    if (t !== null) {
+      labels.push(raceDates[i]);
+      data.push(t);
+    }
+  }
+
+  const colors = EVENT_COLORS[event] || { bg: 'rgba(37,99,235,0.15)', border: '#2563eb' };
+
+  if (currentChart) currentChart.destroy();
+  const ctx = document.getElementById('progressChart').getContext('2d');
+  currentChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: event,
+        data,
+        borderColor: colors.border,
+        backgroundColor: colors.bg,
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointBackgroundColor: colors.border,
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => formatTime(ctx.parsed.y)
+          }
+        }
+      },
+      scales: {
+        y: {
+          reverse: true,
+          title: { display: true, text: 'Time (lower is better)' },
+          ticks: {
+            callback: v => formatTime(v)
+          }
+        }
+      }
+    }
+  });
+}
+
+function drawRanking(selectedKey, event, scope) {
+  const [selLast, selFirst] = selectedKey.split('|');
+  const selRow = allData.find(r => r.last === selLast && r.first === selFirst && r.event === event);
+  if (!selRow) return;
+
+  let candidates = allData.filter(r => r.event === event);
+  if (scope === 'lane') {
+    candidates = candidates.filter(r => r.lane === selRow.lane);
+  } else if (scope === 'age') {
+    candidates = candidates.filter(r => r.age === selRow.age);
+  }
+
+  // Get best time per swimmer for this event
+  const swimmerBests = [];
+  const seen = new Set();
+  for (const r of candidates) {
+    const k = r.last + '|' + r.first;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    const best = parseTime(r.currentBest);
+    if (best && best > 0) {
+      swimmerBests.push({ key: k, first: r.first, last: r.last, age: r.age, lane: r.lane, best });
+    }
+  }
+  swimmerBests.sort((a, b) => a.best - b.best);
+
+  let tableHtml = `<table class="ranking-table">
+    <thead><tr><th>#</th><th>Swimmer</th><th>Age</th><th>Group</th><th>Best Time</th></tr></thead><tbody>`;
+  swimmerBests.forEach((s, i) => {
+    const isSelected = s.key === selectedKey;
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+    tableHtml += `<tr class="${isSelected ? 'highlight' : ''}">
+      <td class="rank ${rankClass}">${i + 1}</td>
+      <td>${s.first} ${s.last}</td>
+      <td>${s.age}</td>
+      <td>${s.lane}</td>
+      <td class="time-cell">${formatTime(s.best)}</td>
+    </tr>`;
+  });
+  tableHtml += `</tbody></table>`;
+
+  document.getElementById('rankingTable').innerHTML = tableHtml;
+}
+
+init();
+</script>
+</body>
+</html>
